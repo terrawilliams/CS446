@@ -3,18 +3,21 @@
 #include <string>
 #include <regex>
 #include <pthread.h>
+#include <semaphore.h>
 #include <iomanip>
 #include "configuration.h"
 #include "MetaData.h"
 #include "PCB.h"
 #include "Timer.h"
 
+sem_t mutex;
+
 void CaseS(MDElement element, Timer timer, bool logToMonitor, bool logToFile, std::ofstream &fout);
 void CaseA(MDElement element, Timer timer, int* numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
 void CaseP(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
 void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int sysMemory);
-void CaseI(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
-void CaseO(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
+void CaseI(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj);
+void CaseO(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj);
 
 void *Wait(void *time);
 
@@ -38,6 +41,9 @@ int main(int argc, char **argv)
 
     Timer timer;
     int numProcess = 1;
+
+    int currentHardDrive = 0;
+    int currentProj = 0;
 
     std::ofstream fout;
     fout.open(confData.GetOutputFile());
@@ -73,18 +79,28 @@ int main(int argc, char **argv)
             case 'I':
                 pcb.setProcessState(Running);
                 pcb.setProcessState(Waiting);
-                CaseI(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout);
+                CaseI(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout, currentHardDrive, currentProj);
                 pcb.setProcessState(Ready);
                 break;
             case 'O':
                 pcb.setProcessState(Running);
                 pcb.setProcessState(Waiting);
-                CaseO(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout);
+                CaseO(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout, currentHardDrive, currentProj);
                 pcb.setProcessState(Ready);
                 break;
             default:
                 break;
         }
+
+        if(metaData.GetData()[i].descriptor == "projector")
+            currentProj++;
+        if(currentProj >= confData.GetProjectorQuantity())
+            currentProj = 0;
+
+        if(metaData.GetData()[i].descriptor == "hard drive")
+            currentHardDrive++;
+        if(currentHardDrive >= confData.GetHardDriveQuantity())
+            currentHardDrive = 0;
     }
 
     fout.close();
@@ -205,39 +221,126 @@ void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bo
     }
 }
 
-void CaseI(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout)
+void CaseI(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj)
 {
     timer.EndTimer();
 
-    if(logToMonitor)
-        std::cout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " input" << std::endl;
-    if(logToFile)
-        fout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " input" << std::endl;
+    if(element.descriptor == "projector" or element.descriptor == "hard drive")
+    {
+        if(logToMonitor)
+        {
+            std::cout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor
+                      << " input on ";
+            if(element.descriptor == "projector")
+                std::cout << "PROJ " << curProj << std::endl;
+            else
+                std::cout << "HDD " << curHardDrive << std::endl;
+        }
+        if(logToFile)
+        {
+            fout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor
+                 << " input on ";
+            if(element.descriptor == "projector")
+                fout << "PROJ " << curProj << std::endl;
+            else
+                fout << "HDD " << curHardDrive << std::endl;
+        }
 
-    pthread_t iThread;
-    pthread_create(&iThread, NULL, Wait, (void*) element.totalTime);
-    pthread_join(iThread, NULL);
+        pthread_t iThread;
 
-    timer.EndTimer();
+        //create semaphore
+        sem_init(&mutex, 0, 1);
+        sem_wait(&mutex);
 
-    if(logToMonitor)
-        std::cout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor << " input" << std::endl;
-    if(logToFile)
-        fout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor << " input" << std::endl;
+        //critical section
+        pthread_create(&iThread, NULL, Wait, (void *) element.totalTime);
+
+        //release semaphore
+        sem_post(&mutex);
+
+        pthread_join(iThread, NULL);
+
+        timer.EndTimer();
+
+        if(logToMonitor)
+            std::cout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor
+                      << " input" << std::endl;
+        if(logToFile)
+            fout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor << " input"
+                 << std::endl;
+    }
+    else
+    {
+        if(logToMonitor)
+            std::cout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor
+                      << " input" << std::endl;
+        if(logToFile)
+            fout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " input"
+                 << std::endl;
+
+        pthread_t iThread;
+
+        //create semaphore
+        sem_init(&mutex, 0, 1);
+        sem_wait(&mutex);
+
+        //critical section
+        pthread_create(&iThread, NULL, Wait, (void *) element.totalTime);
+
+        //release semaphore
+        sem_post(&mutex);
+
+        pthread_join(iThread, NULL);
+
+        timer.EndTimer();
+
+        if(logToMonitor)
+            std::cout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor
+                      << " input" << std::endl;
+        if(logToFile)
+            fout << timer.GetDuration() << " - Process " << numProcess << ": end " << element.descriptor << " input"
+                 << std::endl;
+    }
 }
 
-void CaseO(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout)
+void CaseO(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj)
 {
     timer.EndTimer();
 
     if(logToMonitor)
-        std::cout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " ouput" << std::endl;
+    {
+        std::cout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " ouput";
+
+        if(element.descriptor == "projector")
+            std::cout << " on PROJ " << curProj;
+        else if(element.descriptor == "hard drive")
+            std::cout << " on HDD " << curHardDrive;
+
+        std::cout << std::endl;
+    }
     if(logToFile)
-        fout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " ouput" << std::endl;
+    {
+        fout << timer.GetDuration() << " - Process " << numProcess << ": start " << element.descriptor << " ouput";
+
+        if(element.descriptor == "projector")
+            fout << " on PROJ " << curProj;
+        else if(element.descriptor == "hard drive")
+            fout << " on HDD " << curHardDrive;
+
+        fout << std::endl;
+    }
 
     pthread_t oThread;
+
+    //create semaphore
+    sem_init(&mutex, 0, 1);
+    sem_wait(&mutex);
+
     pthread_create(&oThread, NULL, Wait, (void*) element.totalTime);
     pthread_join(oThread, NULL);
+
+    //release semaphore
+    sem_post(&mutex);
 
     timer.EndTimer();
 

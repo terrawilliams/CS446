@@ -90,7 +90,7 @@ int Configuration::GetProjectorQuantity()
 
 int Configuration::GetHardDriveQuantity()
 {
-    return mHardDriveQuantitiy;
+    return mHardDriveQuantity;
 }
 
 std::string Configuration::GetFilePath()
@@ -287,7 +287,7 @@ void Configuration::ReadFile(std::string filename)
         }
         else if(std::regex_match(confLine, hardDriveQuantity))
         {
-            mHardDriveQuantitiy = ExtractInt(confLine);
+            mHardDriveQuantity = ExtractInt(confLine);
         }
         else if(std::regex_match(confLine, log))
         {

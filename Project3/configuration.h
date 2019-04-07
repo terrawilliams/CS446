@@ -62,7 +62,7 @@ private:
     int mSysMemory;
     int mBlockSize;
     int mProjQuantity;
-    int mHardDriveQuantitiy;
+    int mHardDriveQuantity;
     std::string mFilePath;
     bool mLogToFile;
     bool mLogToMonitor;
