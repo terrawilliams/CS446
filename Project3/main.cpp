@@ -15,7 +15,7 @@ sem_t mutex;
 void CaseS(MDElement element, Timer timer, bool logToMonitor, bool logToFile, std::ofstream &fout);
 void CaseA(MDElement element, Timer timer, int* numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
 void CaseP(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout);
-void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int sysMemory);
+void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int sysMemory, int currentMemory);
 void CaseI(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj);
 void CaseO(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int curHardDrive, int curProj);
 
@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 
     int currentHardDrive = 0;
     int currentProj = 0;
+    int currentMemory = 0;
 
     std::ofstream fout;
     fout.open(confData.GetOutputFile());
@@ -73,7 +74,7 @@ int main(int argc, char **argv)
                 break;
             case 'M':
                 pcb.setProcessState(Running);
-                CaseM(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout, confData.GetSysMemory());
+                CaseM(metaData.GetData()[i], timer, numProcess, logToMonitor, logToFile, fout, confData.GetSysMemory(), currentMemory);
                 pcb.setProcessState(Ready);
                 break;
             case 'I':
@@ -101,6 +102,11 @@ int main(int argc, char **argv)
             currentHardDrive++;
         if(currentHardDrive >= confData.GetHardDriveQuantity())
             currentHardDrive = 0;
+
+        if(metaData.GetData()[i].descriptor == "allocate")
+            currentMemory += confData.GetBlockSize();
+        if(currentMemory >= confData.GetSysMemory())
+            currentMemory = 0;
     }
 
     fout.close();
@@ -178,7 +184,7 @@ void CaseP(MDElement element, Timer timer, int numProcess, bool logToMonitor, bo
         fout << timer.GetDuration() << " - Process " << numProcess << ": end processing action" << std::endl;
 }
 
-void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int sysMemory)
+void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bool logToFile, std::ofstream &fout, int sysMemory, int currentMemory)
 {
     timer.EndTimer();
 
@@ -210,14 +216,10 @@ void CaseM(MDElement element, Timer timer, int numProcess, bool logToMonitor, bo
 
         timer.EndTimer();
 
-        int memLocation;
-
-        memLocation = rand() % sysMemory;
-
         if(logToMonitor)
-            std::cout << timer.GetDuration() << " - Process " << numProcess << ": memory allocated at 0x" << std::hex << memLocation << std::dec << std::endl;
+            std::cout << timer.GetDuration() << " - Process " << numProcess << ": memory allocated at 0x" << std::setfill('0') << std::setw(8) <<std::hex << currentMemory << std::dec << std::endl;
         if(logToFile)
-            fout << timer.GetDuration() << " - Process " << numProcess << ": memory allocated at 0x" << std::endl;
+            fout << timer.GetDuration() << " - Process " << numProcess << ": memory allocated at 0x" << std::setfill('0') << std::setw(8) << std::hex << currentMemory << std::endl;
     }
 }
 
