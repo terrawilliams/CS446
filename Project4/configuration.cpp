@@ -38,6 +38,16 @@ float Configuration::GetVersion()
     return mVersion;
 }
 
+int Configuration::GetQuantumNum()
+{
+    return mQuantumNum;
+}
+
+std::string Configuration::GetScheduleCode()
+{
+    return mScheduleCode;
+}
+
 int Configuration::GetMonitorCycleTime()
 {
     return mMonitor;
@@ -145,6 +155,8 @@ void Configuration::ReadFile(std::string filename)
     std::regex version(" *Version */ *Phase *: +[0-9]+.[0-9]+");
     std::regex fileName(" *File +Path *: +(.*)");
     std::regex fileExtension(" *File +Path *: +(.*).mdf *");
+    std::regex quantumNumber(" *Processor +Quantum +Number *: +[0-9]+");
+    std::regex schedulingCode(" *CPU +Scheduling +Code *: +\\w+ *");
     std::regex monitor(" *Monitor +display +time +\\{ *msec *\\} *: +[0-9]+ *");
     std::regex processor(" *Processor +cycle +time +\\{ *msec *\\} *: +[0-9]+ *");
     std::regex scanner(" *Scanner +cycle +time +\\{ *msec *\\} *: +[0-9]+ *");
@@ -188,6 +200,24 @@ void Configuration::ReadFile(std::string filename)
             ss >> temp;
 
             ss >> mFilePath;
+        }
+        else if(std::regex_match(confLine, quantumNumber))
+        {
+            mQuantumNum = ExtractInt(confLine);
+        }
+        else if(std::regex_match(confLine, schedulingCode))
+        {
+            std::stringstream ss;
+
+            ss << confLine;
+
+            std::string temp;
+
+            ss >> temp;
+            ss >> temp;
+            ss >> temp;
+
+            ss >> mScheduleCode;
         }
         else if(std::regex_match(confLine, monitor))
         {

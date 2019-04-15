@@ -16,6 +16,10 @@ public:
 
     float GetVersion();
 
+    int GetQuantumNum();
+
+    std::string GetScheduleCode();
+
     int GetMonitorCycleTime();
 
     int GetProcessorCycleTime();

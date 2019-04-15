@@ -21,7 +21,7 @@ MetaData::~MetaData()
     mData.clear();
 }
 
-std::vector<MDElement> MetaData::GetData()
+std::vector<Process> MetaData::GetData()
 {
     return mData;
 }
@@ -51,6 +51,8 @@ void MetaData::ReadMetaData(Configuration confData)
 
     std::string metaLine;
 
+    int index = 0;
+
     while(getline(metaFile, metaLine))
     {
         if(std::regex_match(metaLine, start))
@@ -75,7 +77,7 @@ void MetaData::ReadMetaData(Configuration confData)
                         exit(EXIT_FAILURE);
                     }
 
-                    AddToVector(match.str(), confData);
+                    AddToVector(match.str(), confData, &index);
 
                     metaLine = match.suffix().str();
                 }
@@ -119,7 +121,7 @@ void MetaData::ErrorCheck()
     }
 }
 
-void MetaData::AddToVector(std::string newElement, Configuration confData)
+void MetaData::AddToVector(std::string newElement, Configuration confData, int* index)
 {
     newElement.erase(remove(newElement.begin(), newElement.end(), ' '), newElement.end());
 
@@ -141,69 +143,69 @@ void MetaData::AddToVector(std::string newElement, Configuration confData)
     if(std::regex_match(newElement, sBegin))
     {
         mSysStartFound = true;
-        MDElement sysBegin('S', "begin", 0, 0);
-        mData.push_back(sysBegin);
     }
     else if(std::regex_match(newElement, sFinish))
     {
         mSysEndFound = true;
-        MDElement sysFinish('S', "finish", 0, 0);
-        mData.push_back(sysFinish);
     }
     else if(std::regex_match(newElement, aBegin))
     {
-        MDElement appBegin('A', "begin", 0, 0);
-        mData.push_back(appBegin);
+        Process newProcess;
+        mData.push_back(newProcess);
+
+        MDElement appBegin('A', "begin", 0, 0, *index + 1);
+        mData[*index].operations.push_back(appBegin);
     }
     else if(std::regex_match(newElement, aFinish))
     {
-        MDElement appFinish('A', "finish", 0, 0);
-        mData.push_back(appFinish);
+        MDElement appFinish('A', "finish", 0, 0, *index + 1);
+        mData[*index].operations.push_back(appFinish);
+        (*index)++;
     }
     else if(std::regex_match(newElement, run))
     {
-        MDElement pRun('P', "run", ExtractInt(newElement), confData.GetProcessorCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('P', "run", ExtractInt(newElement), confData.GetProcessorCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, iHardDrive))
     {
-        MDElement pRun('I', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('I', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, keyboard))
     {
-        MDElement pRun('I', "keyboard", ExtractInt(newElement), confData.GetKeyboardCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('I', "keyboard", ExtractInt(newElement), confData.GetKeyboardCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, scanner))
     {
-        MDElement pRun('I', "scanner", ExtractInt(newElement), confData.GetScannerCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('I', "scanner", ExtractInt(newElement), confData.GetScannerCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, oHardDrive))
     {
-        MDElement pRun('O', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('O', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, monitor))
     {
-        MDElement pRun('O', "monitor", ExtractInt(newElement), confData.GetMonitorCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('O', "monitor", ExtractInt(newElement), confData.GetMonitorCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, projector))
     {
-        MDElement pRun('O', "projector", ExtractInt(newElement), confData.GetProjectorCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('O', "projector", ExtractInt(newElement), confData.GetProjectorCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, block))
     {
-        MDElement pRun('M', "block", ExtractInt(newElement), confData.GetMemoryCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('M', "block", ExtractInt(newElement), confData.GetMemoryCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else if(std::regex_match(newElement, allocate))
     {
-        MDElement pRun('M', "allocate", ExtractInt(newElement), confData.GetMemoryCycleTime());
-        mData.push_back(pRun);
+        MDElement pRun('M', "allocate", ExtractInt(newElement), confData.GetMemoryCycleTime(), *index + 1);
+        mData[*index].operations.push_back(pRun);
     }
     else
     {
@@ -231,4 +233,9 @@ int MetaData::ExtractInt(std::string str)
     ss >> found;
 
     return found;
+}
+
+void MetaData::Sort()
+{
+
 }

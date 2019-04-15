@@ -1,53 +1,53 @@
-0.000025 - Simulator program starting
-0.000091 - OS: preparing process 1
-0.000091 - OS: starting process 1
-0.000123 - Process 1: start processing action
-0.055130 - Process 1: end processing action
-0.055213 - Process 1: allocating memory
-0.075221 - Process 1: memory allocated at 0x00000000
-0.075282 - Process 1: start monitor ouput
-0.229462 - Process 1: end monitor ouput
-0.229555 - Process 1: start hard drive input on HDD 0
-1.429650 - Process 1: end hard drive input
-1.429741 - Process 1: start projector ouput on PROJ 0
-12.429878 - Process 1: end projector ouput
-12.429983 - Process 1: allocating memory
-12.470001 - Process 1: memory allocated at 0x00000080
-12.470050 - OS: removing process 1
-12.470086 - OS: preparing process 2
-12.470086 - OS: starting process 2
-12.470113 - Process 2: start projector ouput on PROJ 1
-15.770189 - Process 2: end projector ouput
-15.770296 - Process 2: allocating memory
-15.800307 - Process 2: memory allocated at 0x00000100
-15.800351 - Process 2: start hard drive input on HDD 1
-16.850418 - Process 2: end hard drive input
-16.850513 - Process 2: start hard drive ouput on HDD 0
-17.150702 - Process 2: end hard drive ouput
-17.150767 - Process 2: start hard drive ouput on HDD 1
-19.550855 - Process 2: end hard drive ouput
-19.550939 - Process 2: allocating memory
-19.590954 - Process 2: memory allocated at 0x00000180
-19.591044 - Process 2: start processing action
-19.621055 - Process 2: end processing action
-19.621099 - Process 2: start projector ouput on PROJ 2
-21.821181 - Process 2: end projector ouput
-21.821275 - OS: removing process 2
-21.821302 - OS: preparing process 3
-21.821302 - OS: starting process 3
-21.821352 - Process 3: start memory blocking
-21.881364 - Process 3: end memory blocking
+0.000001 - Simulator program starting
+0.000092 - OS: preparing process 1
+0.000092 - OS: starting process 1
+0.000133 - Process 1: start processing action
+0.055143 - Process 1: end processing action
+0.055191 - Process 1: allocating memory
+0.075200 - Process 1: memory allocated at 0x00000000
+0.075249 - Process 1: start monitor ouput
+0.229423 - Process 1: end monitor ouput
+0.229531 - Process 1: start hard drive input on HDD 0
+1.429601 - Process 1: end hard drive input
+1.429696 - Process 1: start projector ouput on PROJ 0
+12.429768 - Process 1: end projector ouput
+12.429864 - Process 1: allocating memory
+12.469876 - Process 1: memory allocated at 0x00000080
+12.469926 - OS: removing process 1
+12.470011 - OS: preparing process 2
+12.470011 - OS: starting process 2
+12.470083 - Process 2: start projector ouput on PROJ 1
+15.770203 - Process 2: end projector ouput
+15.770313 - Process 2: allocating memory
+15.800327 - Process 2: memory allocated at 0x00000100
+15.800378 - Process 2: start hard drive input on HDD 1
+16.850516 - Process 2: end hard drive input
+16.850629 - Process 2: start hard drive ouput on HDD 0
+17.150693 - Process 2: end hard drive ouput
+17.150777 - Process 2: start hard drive ouput on HDD 1
+19.550842 - Process 2: end hard drive ouput
+19.550926 - Process 2: allocating memory
+19.590940 - Process 2: memory allocated at 0x00000180
+19.591020 - Process 2: start processing action
+19.621049 - Process 2: end processing action
+19.621131 - Process 2: start projector ouput on PROJ 2
+21.821200 - Process 2: end projector ouput
+21.821297 - OS: removing process 2
+21.821347 - OS: preparing process 3
+21.821347 - OS: starting process 3
+21.821388 - Process 3: start memory blocking
+21.881399 - Process 3: end memory blocking
 21.881446 - Process 3: start keyboard input
-22.901573 - Process 3: end keyboard input
-22.901711 - Process 3: start memory blocking
-22.941724 - Process 3: end memory blocking
-22.941770 - Process 3: start processing action
-22.966780 - Process 3: end processing action
-22.966822 - Process 3: start processing action
-22.991833 - Process 3: end processing action
-22.991920 - Process 3: start hard drive ouput on HDD 0
-23.892050 - Process 3: end hard drive ouput
-23.892156 - Process 3: start processing action
-23.982167 - Process 3: end processing action
-23.982214 - OS: removing process 3
-23.982274 - Simulator program ending
+22.901586 - Process 3: end keyboard input
+22.901697 - Process 3: start memory blocking
+22.941709 - Process 3: end memory blocking
+22.941755 - Process 3: start processing action
+22.966764 - Process 3: end processing action
+22.966816 - Process 3: start processing action
+22.991826 - Process 3: end processing action
+22.991871 - Process 3: start hard drive ouput on HDD 0
+23.891943 - Process 3: end hard drive ouput
+23.892037 - Process 3: start processing action
+23.982062 - Process 3: end processing action
+23.982113 - OS: removing process 3
+23.982149 - Simulator program ending
