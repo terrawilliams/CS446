@@ -32,10 +32,25 @@ struct Process
 {
     Process()
     {
-        numProcesses = 0;
+        numTasks = 0;
+        numInputOutput = 0;
     }
 
-    int numProcesses;
+    Process & operator = (const Process &P)
+    {
+        numTasks = P.numTasks;
+        numInputOutput = P.numInputOutput;
+
+        for(int i = 0; i < P.operations.size(); i++)
+        {
+            operations.push_back(P.operations[i]);
+        }
+
+        return *this;
+    }
+
+    int numTasks;
+    int numInputOutput;
     std::vector<MDElement> operations;
 };
 
@@ -59,7 +74,7 @@ class MetaData
 
         void AddToVector(std::string newElement, Configuration confData, int* index);
         int ExtractInt(std::string str);
-        void Sort();
+        void Sort(std::string schedule);
 };
 
 

@@ -94,6 +94,8 @@ void MetaData::ReadMetaData(Configuration confData)
     }
 
     metaFile.close();
+
+    Sort(confData.GetScheduleCode());
 }
 
 void MetaData::ErrorCheck()
@@ -166,46 +168,61 @@ void MetaData::AddToVector(std::string newElement, Configuration confData, int* 
     {
         MDElement pRun('P', "run", ExtractInt(newElement), confData.GetProcessorCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
     }
     else if(std::regex_match(newElement, iHardDrive))
     {
         MDElement pRun('I', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, keyboard))
     {
         MDElement pRun('I', "keyboard", ExtractInt(newElement), confData.GetKeyboardCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, scanner))
     {
         MDElement pRun('I', "scanner", ExtractInt(newElement), confData.GetScannerCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, oHardDrive))
     {
         MDElement pRun('O', "hard drive", ExtractInt(newElement), confData.GetHardDriveCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, monitor))
     {
         MDElement pRun('O', "monitor", ExtractInt(newElement), confData.GetMonitorCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, projector))
     {
         MDElement pRun('O', "projector", ExtractInt(newElement), confData.GetProjectorCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
+        mData[*index].numInputOutput++;
     }
     else if(std::regex_match(newElement, block))
     {
         MDElement pRun('M', "block", ExtractInt(newElement), confData.GetMemoryCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
     }
     else if(std::regex_match(newElement, allocate))
     {
         MDElement pRun('M', "allocate", ExtractInt(newElement), confData.GetMemoryCycleTime(), *index + 1);
         mData[*index].operations.push_back(pRun);
+        mData[*index].numTasks++;
     }
     else
     {
@@ -235,7 +252,33 @@ int MetaData::ExtractInt(std::string str)
     return found;
 }
 
-void MetaData::Sort()
+void MetaData::Sort(std::string schedule)
 {
+    if(schedule == "FIFO")
+    {
 
+    }
+    else if(schedule == "PS")
+    {
+        Process sorted[mData.size()];
+
+        for(int i = 0; i < mData.size(); i++)
+        {
+            sorted[i] = mData[i];
+        }
+    }
+    else if(schedule == "SJF")
+    {
+        Process sorted[mData.size()];
+
+        for(int i = 0; i < mData.size(); i++)
+        {
+            sorted[i] = mData[i];
+        }
+    }
+    else
+    {
+        std::cout << "Error: invalid scheduling code" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
