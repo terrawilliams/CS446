@@ -12,6 +12,8 @@
 Configuration::Configuration()
 {
     mVersion = 0.0;
+    mQuantumNum = 1;
+    mScheduleCode = "FIFO";
     mMonitor = 0;
     mProjector = 0;
     mMemory = 0;
@@ -19,11 +21,15 @@ Configuration::Configuration()
     mHardDrive = 0;
     mScanner = 0;
     mProcessor = 0;
+    mBlockSize = 8;
     mSysMemory = 0;
     mFilePath = "empty";
     mOutputFile = "empty";
     mLogToFile = false;
     mLogToMonitor = false;
+    mProjQuantity = 1;
+    mHardDriveQuantity = 1;
+
     mStartFound = false;
     mEndFound = false;
 }

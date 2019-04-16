@@ -260,21 +260,44 @@ void MetaData::Sort(std::string schedule)
     }
     else if(schedule == "PS")
     {
-        Process sorted[mData.size()];
+        int maxIO = 0;
+        int index = 0;
+
+        int order[mData.size()];
+        std::vector<Process> temp;
 
         for(int i = 0; i < mData.size(); i++)
         {
-            sorted[i] = mData[i];
+            temp.push_back(mData[i]);
+        }
+
+        for(int j = 0; j < mData.size(); j++)
+        {
+            maxIO = 0;
+
+            for(int i = 0; i < mData.size(); i++)
+            {
+                if(mData[i].numInputOutput > maxIO)
+                {
+                    index = i;
+                    maxIO = mData[i].numInputOutput;
+                    order[j] = index;
+                }
+            }
+
+            mData[index].numInputOutput = 0;
+        }
+
+        mData.clear();
+        for(int i = 0; i < temp.size(); i++)
+        {
+            mData.push_back(temp[order[i]]);
         }
     }
     else if(schedule == "SJF")
     {
-        Process sorted[mData.size()];
-
-        for(int i = 0; i < mData.size(); i++)
-        {
-            sorted[i] = mData[i];
-        }
+        int minTasks = 0;
+        int index = 0;
     }
     else
     {
